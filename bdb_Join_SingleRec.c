@@ -176,14 +176,13 @@ automotive auto_s, *auto_p;;
 
         memset(&key, 0, sizeof(DBT));
         memset(&data, 0, sizeof(DBT));
-        key.data = &auto_s.auto_id;
-        key.size = sizeof(int);
-        data.data = auto_p;
-        data.size = sizeof(automotive);
-                data.ulen = sizeof(automotive);
-        data.flags = DB_DBT_USERMEM;
 
-        while ((ret = auto_curs->get(auto_curs, &key, &data, DB_NEXT)) == 0) {
+        for (ret = auto_curs->get(auto_curs, &key, &data, DB_FIRST);
+                ret == 0;
+                ret = auto_curs->get(auto_curs, &key, &data, DB_NEXT )) {
+
+                auto_p = data.data;
+                printf("\nData after get...\n");
                 printf("\nGet values [%d], [%s], [%s], [%s], [%s] \n", auto_p->auto_id, auto_p->auto_name,
                         auto_p->auto_color, auto_p->auto_make, auto_p->auto_type);
         }
@@ -258,9 +257,6 @@ if ((ret = automotiveDB->join(automotiveDB, carray, &join_curs, 0)) != 0) {
 
 /* Iterate using the join cursor */
 while ((ret = join_curs->get(join_curs, &key, &data, 0)) == 0) {
-                printf("%.*s : %.*s\n",
-                    (int)key.size, (char *)key.data,
-                    (int)data.size, (char *)data.data);
                 printf("\nGet values [%d], [%s], [%s], [%s], [%s] \n", auto_p->auto_id, auto_p->auto_name,
                         auto_p->auto_color, auto_p->auto_make, auto_p->auto_type);
 
